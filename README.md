@@ -1,3 +1,7 @@
+> [!NOTE]  
+> **Seeking Investment**: We are raising funds to expand language support and scale infrastructure. Interested investors can reach out at [social.sakshamjoshi@gmail.com](mailto:social.sakshamjoshi@gmail.com).\
+> **Note:** This public repository contains only a subset of the full Senti-Vox's codebase.
+
 <div align="center">
 
 # 🎭 Senti-Vox
@@ -124,16 +128,14 @@ Senti-Vox/
 │   ├── public/
 │   └── README.md
 │
-├── dataset/
-│
 └── Images/
 ```
 
 | Directory | Description |
 |-----------|-------------|
 | **[`/api`](./api)** | Backend API built with **ElysiaJS** and **Bun** - handles sentiment analysis and token management |
-| **[`/site`](./site)** | Full stack web app built with **Next.js 16** - provides UI for API interaction |
-| **[`/dataset`](./dataset)** | Datasets for model validation and improvement |
+| **[`/site`](./site)** | Full stack web app built with **Next.js 16** and **Supabase** - provides UI for API interaction |
+| **[`/Images`](./Images)** | Contains PNG and SVG Logos of Senti-Vox |
 
 ---
 
@@ -141,11 +143,7 @@ Senti-Vox/
 
 ### Prerequisites
 
-Ensure you have [Bun](https://bun.sh) installed:
-
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
+Ensure you have [Bun](https://bun.sh) installed: <a href="https://github.com/oven-sh/bun/releases/">bun/releases</a>.
 
 ### Quick Start
 
