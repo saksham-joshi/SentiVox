@@ -1,0 +1,17 @@
+{
+  "name": "redis-interface",
+  "version": "1.0.50",
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build" : "bun build --target=bun --minify-whitespace --minify-syntax --outfile ./dist/index.js src/index.ts",
+    "start": "bun ./dist/index.js",
+    "test" : "bun test ./test.ts"
+  },
+  "dependencies": {
+    "elysia": "latest"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "module": "src/index.js"
+}
