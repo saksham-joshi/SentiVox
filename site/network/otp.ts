@@ -1,3 +1,5 @@
+"use server"
+
 import { VALUES } from "@/lib/values";
 import { COLORS } from "@/lib/colors";
 import nodemailer from "nodemailer";
