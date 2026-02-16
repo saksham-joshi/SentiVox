@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createUser, isApiKeyUnique } from "@/network/supabase";
 import { generateApiKey } from "@/network/api";
-import { addFreeTokens } from "@/network/api";
+import { grantFreeTokens } from "@/network/redis";
 import { VALUES } from "@/lib/values";
 
 // Name validation: alphabets and spaces only, max 19 characters
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
     const apiKey = await generateUniqueApiKey();
 
     // Add free tokens
-    if (!await addFreeTokens(apiKey))
+    if (!await grantFreeTokens(apiKey))
     {
       return NextResponse.json(
         { error: "Failed to add free tokens. Please try again." },
