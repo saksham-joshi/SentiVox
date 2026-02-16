@@ -30,8 +30,7 @@ export const DOCS = {
             "/health": "GET - Health check",
             "/docs": "GET - Documentations",
             "/langs": "GET - Supported languages",
-            "/tokenize": "POST- Tokenizes the text",
-            "/tokenCount": "POST - Returns the remaining tokens associated with your API Key"
+            "/tokenize": "POST- Tokenizes the text"
         },
 
         utility: {
