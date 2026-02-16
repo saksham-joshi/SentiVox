@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Key, Copy, Eye, EyeOff, LogOut, Calendar, CheckCircle } from "lucide-react";
-import { getTokenCount } from "@/network/api";
+import { User, Key, Copy, Eye, EyeOff, LogOut, Calendar, CheckCircle, RefreshCw } from "lucide-react";
+import { refreshApiKey, getTokenCount } from "@/network/redis";
 
 export default function AccountPage() {
     const router = useRouter();
@@ -76,6 +76,24 @@ export default function AccountPage() {
         });
     };
 
+    const handleRefreshTokenCount = async () => {
+        if (user?.apikey) {
+            try {
+                setTokenLoading(true);
+                // Call refreshApiKey first as requested
+                await refreshApiKey(user.apikey);
+                // Then get the updated count
+                const count = await getTokenCount(user.apikey);
+                setTokenCount(count);
+            } catch (error) {
+                console.error("Failed to refresh token count:", error);
+                setTokenCount(null);
+            } finally {
+                setTokenLoading(false);
+            }
+        }
+    };
+
     // Show loading state
     if (isLoading) {
         return (
@@ -122,7 +140,19 @@ export default function AccountPage() {
 
                         {/* Token Count */}
                         <div className="space-y-1">
-                            <label className="text-sm text-muted-foreground">Token Count</label>
+                            <div className="flex items-center gap-2">
+                                <label className="text-sm text-muted-foreground">Token Count</label>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors"
+                                    onClick={handleRefreshTokenCount}
+                                    disabled={tokenLoading}
+                                    title="Refresh Token Count"
+                                >
+                                    <RefreshCw size={14} className={tokenLoading ? "animate-spin" : ""} />
+                                </Button>
+                            </div>
                             <p className="text-lg font-medium">
                                 {tokenLoading ? (
                                     <span className="animate-pulse">Loading...</span>
