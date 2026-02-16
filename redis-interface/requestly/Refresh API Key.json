@@ -1,0 +1,20 @@
+{
+  "name": "Refresh API Key",
+  "request": {
+    "type": "http",
+    "url": "http://localhost:3000/refreshApiKey",
+    "scripts": {
+      "preRequest": "",
+      "postResponse": ""
+    },
+    "method": "POST",
+    "queryParams": [],
+    "headers": [],
+    "body": "{\n  \"api-key\" : \"\"\n}",
+    "contentType": "application/json",
+    "auth": {
+      "currentAuthType": "INHERIT",
+      "authConfigStore": {}
+    }
+  }
+}

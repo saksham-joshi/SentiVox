@@ -1,0 +1,19 @@
+{
+  "name": "404_GET",
+  "request": {
+    "type": "http",
+    "url": "http://localhost:3000/xyz",
+    "scripts": {
+      "preRequest": "",
+      "postResponse": ""
+    },
+    "method": "GET",
+    "queryParams": [],
+    "headers": [],
+    "contentType": "text/plain",
+    "auth": {
+      "currentAuthType": "INHERIT",
+      "authConfigStore": {}
+    }
+  }
+}

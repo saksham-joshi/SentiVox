@@ -1,0 +1,19 @@
+{
+  "name": "health-check",
+  "request": {
+    "type": "http",
+    "url": "http://localhost:3000/health",
+    "scripts": {
+      "preRequest": "",
+      "postResponse": ""
+    },
+    "method": "GET",
+    "queryParams": [],
+    "headers": [],
+    "contentType": "text/plain",
+    "auth": {
+      "currentAuthType": "INHERIT",
+      "authConfigStore": {}
+    }
+  }
+}

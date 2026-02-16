@@ -1,0 +1,20 @@
+{
+  "name": "Delete API Key",
+  "request": {
+    "type": "http",
+    "url": "http://localhost:3000/deleteApiKey",
+    "scripts": {
+      "preRequest": "",
+      "postResponse": ""
+    },
+    "method": "POST",
+    "queryParams": [],
+    "headers": [],
+    "body": "{\n  \"api-key\" : \"test-api-123\",\n  \"password\" : \"\"\n}",
+    "contentType": "application/json",
+    "auth": {
+      "currentAuthType": "INHERIT",
+      "authConfigStore": {}
+    }
+  }
+}
