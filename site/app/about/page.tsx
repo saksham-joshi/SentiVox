@@ -8,6 +8,8 @@ import { SEO } from "@/lib/seo";
 import { TechIcons } from "@/lib/tech";
 import { SVG } from "@/lib/svg";
 import { DOCS } from "@/lib/docs";
+import { InfoIcon } from "lucide-react";
+import { memo } from "react";
 
 export const metadata: Metadata = {
   title: "About",
@@ -79,7 +81,7 @@ const socialLinks = [
   },
 ];
 
-export default function AboutPage() {
+function AboutPage() {
   return (
     <div className="min-h-screen py-12 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
@@ -107,7 +109,6 @@ export default function AboutPage() {
               rel="noopener noreferrer"
             >
               <Button variant="outline" className="gap-2">
-                {/* <Github size={18} /> */}
                 <div className="w-2 h-2 items-center px-2 justify-center flex">
                   {SVG.github}
                 </div>
@@ -115,16 +116,14 @@ export default function AboutPage() {
                 <div className="w-2 h-2 items-center px-2 justify-center flex">
                   {SVG.externalLink}
                 </div>
-                {/* <ExternalLink size={14} /> */}
               </Button>
             </Link>
-            <Link href="/docs">
+            <Link href={VALUES.PRIVACY_POLICY.route}>
               <Button className="gap-2">
-                {/* <Code size={18} /> */}
                 <div className="w-2 h-2 items-center px-2 justify-center flex">
-                  {SVG.code}
+                  <InfoIcon size={18} />
                 </div>
-                Read Docs
+                Privacy Policy
               </Button>
             </Link>
           </div>
@@ -228,3 +227,5 @@ export default function AboutPage() {
     </div>
   );
 }
+
+export default memo(AboutPage);

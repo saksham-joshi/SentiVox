@@ -6,6 +6,7 @@ import { Wrench, Code, Server, ArrowRight, ExternalLink, Languages, Smile } from
 import Link from "next/link";
 import { SEO } from "@/lib/seo";
 import ApiUrlBlock from "@/components/ApiUrlBlock";
+import { memo } from "react";
 
 export const metadata: Metadata = {
     title: "Documentation",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     twitter: SEO.twitter
 };
 
-export default function DocsPage() {
+function DocsPage() {
     return (
         <div className="min-h-screen py-12 lg:py-20">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
@@ -217,3 +218,5 @@ export default function DocsPage() {
         </div>
     );
 }
+
+export default memo(DocsPage);
