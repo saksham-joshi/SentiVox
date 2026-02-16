@@ -85,64 +85,13 @@ export async function analyzeSingleComment(
     throw new Error(__data.error);
   }
 
+  if (__data[JSON_KEYS.error]) {
+    throw new Error(__data[JSON_KEYS.error]);
+  }
+
   const result = convertToAnalysisResult(__data);
 
   result.originalText = __comment;
 
   return result;
-}
-
-export async function addFreeTokens(__api_key: string) : Promise<boolean> {
-
-  const password = process.env.FREE_TOKEN_PASSWORD || null;
-
-  if (!password) {
-    console.error("MISSING .ENV 'FREE_TOKEN_PASSWORD'");
-  }
-
-  try {
-    const __response = await fetch(`${API_URL}/grantFreeTokens`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        [JSON_KEYS.apiKey]: __api_key,
-        [JSON_KEYS.password]: password,
-      }),
-    });
-    const __data = await __response.json();
-
-    if (!__response.ok) {
-      console.error(JSON.stringify(__data));
-      throw new Error(__data.error);
-    }
-
-    return true;
-  } catch (err) {
-    console.error("Failed to add free tokens: " + err);
-  }
-
-  return false;
-}
-
-export async function getTokenCount(__api_key: string): Promise<number> {
-  const __response = await fetch(`${API_URL}/tokenCount`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      [JSON_KEYS.apiKey]: __api_key,
-    }),
-  });
-
-  const __data = await __response.json();
-
-  if (!__response.ok) {
-    console.error(JSON.stringify(__data));
-    throw new Error(__data.error);
-  }
-
-  return __data[JSON_KEYS.tokenCount];
 }
