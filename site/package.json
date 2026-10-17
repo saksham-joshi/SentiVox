@@ -1,20 +1,27 @@
 {
   "name": "senti-vox",
-  "version": "0.1.0",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "dev": "bun --bun run next dev",
     "build": "bun --bun run next build",
     "start": "bun --bun run next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "format": "bunx prettier . --write",
+    "format:check": "bunx prettier . --check",
+    "fetch-schema": "bunx drizzle-kit pull"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.93.3",
+    "@icons-pack/react-simple-icons": "^13.13.0",
+    "@upstash/redis": "^1.38.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "drizzle-orm": "^0.45.2",
+    "jose": "^6.2.9",
     "lucide-react": "^0.562.0",
-    "next": "16.1.1",
+    "next": "16.3.1",
     "nodemailer": "^8.0.0",
+    "pg": "^8.23.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwind-merge": "^3.4.0"
@@ -23,12 +30,17 @@
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/nodemailer": "^7.0.9",
+    "@types/pg": "^8.21.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "bun-types": "latest",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
-    "tailwindcss": "^4",
+    "eslint-config-prettier": "^10.1.8",
+    "postcss": "^8.5.26",
+    "prettier": "^3.9.6",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5"
   },
   "ignoreScripts": [
