@@ -4,6 +4,7 @@ import {
   getTokenCount,
   grantFreeTokens,
   refreshApiKey,
+  rotateApiKey,
   verifyApiKey,
 } from "./redis";
 import { VALUES } from "./values";
@@ -11,13 +12,16 @@ import { VALUES } from "./values";
 const FREE_TOKEN_PASSWORD = process.env.FREE_TOKEN_PASSWORD;
 const DEDUCT_TOKEN_PASSWORD = process.env.DEDUCT_TOKEN_PASSWORD;
 const DELETE_API_KEY_PASSWORD = process.env.DELETE_API_KEY_PASSWORD;
+const ROTATE_API_KEY_PASSWORD = process.env.ROTATE_API_KEY_PASSWORD;
 
 if (
   !FREE_TOKEN_PASSWORD ||
   !DEDUCT_TOKEN_PASSWORD ||
-  !DELETE_API_KEY_PASSWORD
+  !DELETE_API_KEY_PASSWORD ||
+  !ROTATE_API_KEY_PASSWORD
 ) {
   console.error("CANNOT FIND ENV VARIABLE FOR PASSWORDS");
+  process.exit(1);
 }
 
 export async function handle_getTokenCount({ body, set }: any) {
@@ -41,7 +45,8 @@ export async function handle_getTokenCount({ body, set }: any) {
       [VALUES.jsonKeys.tokenCount]: token_count,
     };
   } catch (err) {
-    console.error(err);
+    console.error(" >> Caught Error:" + err);
+    set.status = VALUES.statusCode.unknownError
     return { [VALUES.jsonKeys.error]: err?.toString() };
   }
 }
@@ -69,9 +74,10 @@ export async function handle_grantFreeTokens({ body, set }: any) {
 
     set.status = VALUES.statusCode.missingOrInvalidAuth;
 
-    return { error: "Invalid Password!" };
+    return { [VALUES.jsonKeys.error] : "Invalid Password!" };
   } catch (err) {
-    console.error(err);
+    console.error(" >> Caught Error:" + err);
+    set.status = VALUES.statusCode.unknownError
     return { [VALUES.jsonKeys.error]: err?.toString() };
   }
 }
@@ -91,7 +97,8 @@ export async function handle_verifyApiKey({ body, set }: any) {
 
     return { [VALUES.jsonKeys.result]: await verifyApiKey(apiKey) };
   } catch (err) {
-    console.error(err);
+    console.error(" >> Caught Error:" + err);
+    set.status = VALUES.statusCode.unknownError
     return { [VALUES.jsonKeys.error]: err?.toString() };
   }
 }
@@ -121,7 +128,8 @@ export async function handle_deleteApiKey({ body, set }: any) {
 
     return { error: "Invalid Password!" };
   } catch (err) {
-    console.error(err);
+    console.error(" >> Caught Error:" + err);
+    set.status = VALUES.statusCode.unknownError
     return { [VALUES.jsonKeys.error]: err?.toString() };
   }
 }
@@ -141,7 +149,8 @@ export async function handle_refreshApiKey({ body, set }: any) {
 
     return { [VALUES.jsonKeys.result]: await refreshApiKey(apiKey) };
   } catch (err) {
-    console.error(err);
+    console.error(" >> Caught Error:" + err);
+    set.status = VALUES.statusCode.unknownError
     return { [VALUES.jsonKeys.error]: err?.toString() };
   }
 }
@@ -177,7 +186,43 @@ export async function handle_deductToken({ body, set }: any) {
 
     return { error: "Invalid Password!" };
   } catch (err) {
-    console.error(err);
+    console.error(" >> Caught Error:" + err);
+    set.status = VALUES.statusCode.unknownError
     return { [VALUES.jsonKeys.error]: err?.toString() };
+  }
+}
+
+export async function handle_rotateApiKey({body, set} : any) {
+  try {
+    const {
+      [VALUES.jsonKeys.oldApiKey] : oldApiKey,
+      [VALUES.jsonKeys.newApiKey] : newApiKey,
+      [VALUES.jsonKeys.password] : password
+    } = body as {
+      [VALUES.jsonKeys.oldApiKey] : string,
+      [VALUES.jsonKeys.newApiKey] : string,
+      [VALUES.jsonKeys.password] : string
+    }
+
+    if(!oldApiKey || !newApiKey || !password) {
+      set.status = VALUES.statusCode.invalidJsonFormat;
+
+      return { [VALUES.jsonKeys.error] : "Invalid JSON Format" }
+    }
+  
+    if(password === ROTATE_API_KEY_PASSWORD && await rotateApiKey(oldApiKey, newApiKey) ) {
+      set.status = VALUES.statusCode.success;
+      return { [VALUES.jsonKeys.result] : true }
+    }
+
+    set.status = VALUES.statusCode.validRequestButFailedValidation;
+
+    return {[VALUES.jsonKeys.error] : "Invalid Password or Operation failed at redis" };
+  }
+  catch(err)
+  {
+    console.error(" >> Caught Error:" + err);
+    set.status = VALUES.statusCode.unknownError
+    return { [VALUES.jsonKeys.error] : err?.toString() ?? "Something went wrong"}
   }
 }

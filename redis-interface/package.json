@@ -3,11 +3,12 @@
   "version": "1.0.50",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
-    "build" : "bun build --target=bun --minify-whitespace --minify-syntax --outfile ./dist/index.js src/index.ts",
+    "build": "bun build --target=bun --minify-whitespace --minify-syntax --outfile ./dist/index.js src/index.ts",
     "start": "bun ./dist/index.js",
-    "test" : "bun test ./test.ts"
+    "test": "bun test ./test.ts"
   },
   "dependencies": {
+    "@upstash/redis": "^1.38.0",
     "elysia": "latest"
   },
   "devDependencies": {

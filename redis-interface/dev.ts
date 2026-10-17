@@ -1,4 +1,25 @@
-import { redis } from "bun";
+import { Redis } from "@upstash/redis";
+
+const UPSTASH_REDIS_URL = process.env.UPSTASH_REDIS_URL;
+const UPSTASH_REDIS_TOKEN = process.env.UPSTASH_REDIS_TOKEN;
+
+if(!UPSTASH_REDIS_URL || !UPSTASH_REDIS_TOKEN)
+{
+  console.error(">> [CANNOT LOAD ENVIRONMENT VARIABLES OF REDIS URL AND REDIS TOKEN]");
+  process.exit(1);
+}
+
+const redis = new Redis({
+  url: UPSTASH_REDIS_URL,
+  token: UPSTASH_REDIS_TOKEN,
+  enableTelemetry: false
+});
+
+if(!redis)
+{
+  console.error("\n [REDIS IS NOT CONNECTED]");
+  process.exit(1);
+}
 
 export async function getAllRedisValues() {
   if (!redis) {
@@ -18,8 +39,6 @@ export async function getAllRedisValues() {
   return result;
 }
 
-// await getAllRedisValues();
-
 export async function deleteTestApiKeys() {
   if (redis) {
     const keys = await redis.keys("*");
@@ -33,9 +52,6 @@ export async function deleteTestApiKeys() {
   }
 }
 
-// await deleteTestApiKeys()
-// await getAllRedisValues()
-
 export async function getRedisValue(key: string) {
   if (!redis) {
     throw new Error("Redis is not connected");
@@ -47,11 +63,9 @@ export async function getRedisValue(key: string) {
   return value;
 }
 
-// getRedisValue("test-api-1771053000798")
-
 export function generateRandomString(__len: number) {
   const characters =
-    "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789_-";
+    "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz0123456789_-*!@#%^*()+|/><,.[]{}";
   const ar = new Uint8Array(__len);
 
   crypto.getRandomValues(ar);
@@ -66,3 +80,7 @@ export function generateRandomString(__len: number) {
 
   return randomstring;
 }
+
+
+// await deleteTestApiKeys()
+// await getAllRedisValues()

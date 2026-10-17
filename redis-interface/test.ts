@@ -1,22 +1,27 @@
 import { describe, expect, test } from "bun:test";
 import { VALUES } from "./src/values";
 
-const BASE_URL = "http://localhost:3000";
-// const API_KEY = "test-api-" + Date.now();
+// const BASE_URL = "http://localhost:3000";
+const BASE_URL = "https://sentivox-redis-interface.onrender.com";
+
 const API_KEY = "test-api-123";
+const NEW_API_KEY = "test-api-456";
 
 const FREE_TOKEN_PASSWORD = process.env.FREE_TOKEN_PASSWORD;
 const DEDUCT_TOKEN_PASSWORD = process.env.DEDUCT_TOKEN_PASSWORD;
 const DELETE_API_KEY_PASSWORD = process.env.DELETE_API_KEY_PASSWORD;
+const ROTATE_API_KEY_PASSWORD = process.env.ROTATE_API_KEY_PASSWORD;
 
 if (
   !FREE_TOKEN_PASSWORD ||
   !DEDUCT_TOKEN_PASSWORD ||
-  !DELETE_API_KEY_PASSWORD
+  !DELETE_API_KEY_PASSWORD ||
+  !ROTATE_API_KEY_PASSWORD
 ) {
-  console.warn(
+  console.error(
     "WARNING: Passwords not found in env. Tests requiring authorization might fail."
   );
+  process.exit(1)
 }
 
 describe("Redis Interface API", () => {
@@ -47,21 +52,12 @@ describe("Redis Interface API", () => {
     });
     const data = await countRes.json();
     expect(data[VALUES.jsonKeys.tokenCount]).toBe(
-      `${VALUES.dailyFreeTokenCount}`
+      VALUES.dailyFreeTokenCount
     );
   });
 
   test("Deduct Tokens", async () => {
-    // Ensure we have tokens first
-    await fetch(`${BASE_URL}${VALUES.routes.grantFreeTokens}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        [VALUES.jsonKeys.apiKey]: API_KEY,
-        [VALUES.jsonKeys.password]: FREE_TOKEN_PASSWORD,
-      }),
-    });
-
+    
     const deductAmount = 100;
     const res = await fetch(`${BASE_URL}${VALUES.routes.deductToken}`, {
       method: "POST",
@@ -85,7 +81,7 @@ describe("Redis Interface API", () => {
     });
     const countData = await countRes.json();
     expect(countData[VALUES.jsonKeys.tokenCount]).toBe(
-      (VALUES.dailyFreeTokenCount - deductAmount).toString()
+      VALUES.dailyFreeTokenCount - deductAmount
     );
   });
 
@@ -112,12 +108,42 @@ describe("Redis Interface API", () => {
     expect(data[VALUES.jsonKeys.result]).toBe(true);
   });
 
+  test("Rotating API Key", async () => {
+    const res1 = await fetch(`${BASE_URL}${VALUES.routes.rotateApiKey}`, {
+      method: "POST",
+      headers: { "Content-Type" : "application/json" },
+      body: JSON.stringify({
+        [VALUES.jsonKeys.oldApiKey]: API_KEY,
+        [VALUES.jsonKeys.newApiKey]: NEW_API_KEY,
+        [VALUES.jsonKeys.password]: ROTATE_API_KEY_PASSWORD
+      })
+    });
+    expect(res1.status).toBe(200);
+    const data1 = await res1.json();
+    expect(data1[VALUES.jsonKeys.result]).toBe(true);
+
+    // deduct token script takes both token count and last updated into account
+    // so to check if rotation worked well it is a good testcase
+    const res2 = await fetch(`${BASE_URL}${VALUES.routes.deductToken}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        [VALUES.jsonKeys.apiKey]: NEW_API_KEY,
+        [VALUES.jsonKeys.password]: DEDUCT_TOKEN_PASSWORD,
+        [VALUES.jsonKeys.tokenCount]: 100,
+      }),
+    });
+    expect(res2.status).toBe(200);
+    const data2 = await res2.json();
+    expect(data2[VALUES.jsonKeys.result]).toBe(true);
+  });
+
   test("Delete API Key", async () => {
     const res = await fetch(`${BASE_URL}${VALUES.routes.deleteApiKey}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        [VALUES.jsonKeys.apiKey]: API_KEY,
+        [VALUES.jsonKeys.apiKey]: NEW_API_KEY,
         [VALUES.jsonKeys.password]: DELETE_API_KEY_PASSWORD,
       }),
     });
@@ -129,7 +155,7 @@ describe("Redis Interface API", () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        [VALUES.jsonKeys.apiKey]: API_KEY,
+        [VALUES.jsonKeys.apiKey]: NEW_API_KEY,
       }),
     });
     const verifyData = await verifyRes.json();

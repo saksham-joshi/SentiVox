@@ -11,6 +11,8 @@ export const VALUES = {
     password: "password",
     result: "result",
     error: "error",
+    newApiKey: "new-api-key",
+    oldApiKey: "old-api-key"
   },
   routes: {
     getTokenCount: "/getTokenCount",
@@ -20,6 +22,7 @@ export const VALUES = {
     deductToken: "/deductToken",
     deleteApiKey: "/deleteApiKey",
     refreshApiKey: "/refreshApiKey",
+    rotateApiKey : "/rotateApiKey"
   },
   statusCode: {
     success: 200,
@@ -27,6 +30,7 @@ export const VALUES = {
     missingOrInvalidAuth: 401,
     invalidEndpoint: 404,
     validRequestButFailedValidation: 422,
+    unknownError: 520
   },
   redisReturnCode: {
     success: 0,

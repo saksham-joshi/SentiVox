@@ -6,6 +6,7 @@ import {
   handle_getTokenCount,
   handle_grantFreeTokens,
   handle_refreshApiKey,
+  handle_rotateApiKey,
   handle_verifyApiKey,
 } from "./handler";
 
@@ -17,6 +18,7 @@ const app = new Elysia()
   .post(VALUES.routes.deleteApiKey, handle_deleteApiKey)
   .post(VALUES.routes.refreshApiKey, handle_refreshApiKey)
   .post(VALUES.routes.deductToken, handle_deductToken)
+  .post(VALUES.routes.rotateApiKey, handle_rotateApiKey)
   .post("*", async ({ set }) => {
     set.status = VALUES.statusCode.invalidEndpoint;
     return { [VALUES.jsonKeys.error]: "Invalid Endpoint" };
