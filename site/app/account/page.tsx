@@ -1,250 +1,42 @@
-"use client";
+import { redirect } from 'next/navigation'
+import { getSession } from '@/lib/session'
+import { getUserDetails } from '@/db/pg'
+import AccountClientView from '@/components/AccountClientView'
+import type { Metadata } from 'next'
+import { VALUES } from '@/lib/values'
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Key, Copy, Eye, EyeOff, LogOut, Calendar, CheckCircle, RefreshCw } from "lucide-react";
-import { refreshApiKey, getTokenCount } from "@/network/redis";
+export const metadata: Metadata = {
+  title: 'Account',
+  description: `Manage your ${VALUES.APP_NAME} account credentials and API key.`,
+  robots: { index: false, follow: false },
+}
 
-export default function AccountPage() {
-    const router = useRouter();
-    const { user, isLoggedIn, isLoading, logout } = useAuth();
-    const [showApiKey, setShowApiKey] = useState(false);
-    const [copied, setCopied] = useState(false);
-    const [tokenCount, setTokenCount] = useState<number | null>(null);
-    const [tokenLoading, setTokenLoading] = useState(true);
+export default async function AccountPage() {
+  const session = await getSession()
 
-    // Redirect to login if not authenticated
-    useEffect(() => {
-        if (!isLoading && !isLoggedIn) {
-            router.push("/login");
-        }
-    }, [isLoading, isLoggedIn, router]);
+  if (!session) {
+    redirect('/login')
+  }
 
-    // Fetch token count when user is authenticated
-    useEffect(() => {
-        const fetchTokenCount = async () => {
-            if (user?.apikey) {
-                try {
-                    setTokenLoading(true);
-                    const count = await getTokenCount(user.apikey);
-                    setTokenCount(count);
-                } catch (error) {
-                    console.error("Failed to fetch token count:", error);
-                    setTokenCount(null);
-                } finally {
-                    setTokenLoading(false);
-                }
-            }
-        };
+  const user = await getUserDetails(session.email)
 
-        if (isLoggedIn && user) {
-            fetchTokenCount();
-        }
-    }, [isLoggedIn, user]);
+  if (!user) {
+    redirect('/login')
+  }
 
-    const handleCopyApiKey = async () => {
-        if (user?.apikey) {
-            try {
-                await navigator.clipboard?.writeText(user.apikey);
-                setCopied(true);
-                setTimeout(() => setCopied(false), 2000);
-            } catch (err) {
-                console.error("Failed to copy:", err);
-            }
-        }
-    };
+  const serializedUser = {
+    email: user.email,
+    fullName: user.fullName,
+    apiKey: user.apiKey,
+    joinDate: user.joinDate ? user.joinDate.toString() : null,
+    apiKeyUpdateTime: user.apiKeyUpdateTime
+      ? user.apiKeyUpdateTime.toString()
+      : null,
+  }
 
-    const handleLogout = () => {
-        logout();
-        router.push("/");
-    };
-
-    const maskApiKey = (key: string) => {
-        if (key.length <= 8) return "•".repeat(key.length);
-        return key.substring(0, 4) + "•".repeat(key.length - 8) + key.substring(key.length - 4);
-    };
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
-    };
-
-    const handleRefreshTokenCount = async () => {
-        if (user?.apikey) {
-            try {
-                setTokenLoading(true);
-                // Call refreshApiKey first as requested
-                await refreshApiKey(user.apikey);
-                // Then get the updated count
-                const count = await getTokenCount(user.apikey);
-                setTokenCount(count);
-            } catch (error) {
-                console.error("Failed to refresh token count:", error);
-                setTokenCount(null);
-            } finally {
-                setTokenLoading(false);
-            }
-        }
-    };
-
-    // Show loading state
-    if (isLoading) {
-        return (
-            <div className="min-h-screen flex justify-center items-center">
-                <div className="animate-pulse text-muted-foreground">Loading...</div>
-            </div>
-        );
-    }
-
-    // Don't render if not logged in (will redirect)
-    if (!isLoggedIn || !user) {
-        return null;
-    }
-
-    return (
-        <div className="min-h-screen flex justify-center px-4 py-20 items-start">
-            <div className="w-full max-w-lg space-y-6">
-                {/* Header */}
-                <div className="text-center">
-                    <h1 className="text-3xl font-bold mb-2">Your Account</h1>
-                    <p className="text-muted-foreground">Manage your Senti-Vox account</p>
-                </div>
-
-                {/* User Info Card */}
-                <Card className="border-border/50 shadow-xl">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-xl text-primary">
-                            <User size={20} />
-                            Profile Information
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {/* Name */}
-                        <div className="space-y-1">
-                            <label className="text-sm text-muted-foreground">Name</label>
-                            <p className="text-lg font-medium">{user.name}</p>
-                        </div>
-
-                        {/* Email */}
-                        <div className="space-y-1">
-                            <label className="text-sm text-muted-foreground">Email</label>
-                            <p className="text-lg font-medium">{user.email}</p>
-                        </div>
-
-                        {/* Token Count */}
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                                <label className="text-sm text-muted-foreground">Token Count</label>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6 text-muted-foreground hover:text-primary transition-colors"
-                                    onClick={handleRefreshTokenCount}
-                                    disabled={tokenLoading}
-                                    title="Refresh Token Count"
-                                >
-                                    <RefreshCw size={14} className={tokenLoading ? "animate-spin" : ""} />
-                                </Button>
-                            </div>
-                            <p className="text-lg font-medium">
-                                {tokenLoading ? (
-                                    <span className="animate-pulse">Loading...</span>
-                                ) : tokenCount !== null && tokenCount !== undefined ? (
-                                    <span>{tokenCount.toLocaleString()}</span>
-                                ) : (
-                                    <span className="text-destructive">Failed to load</span>
-                                )}
-                            </p>
-                        </div>
-
-                        {/* Join Date */}
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Calendar size={14} />
-                            Member since {formatDate(user.join_date)}
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* API Key Card */}
-                <Card className="border-border/50 shadow-xl">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-xl text-primary">
-                            <Key size={20} />
-                            API Key
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <p className="text-sm text-muted-foreground">
-                            Use this key to authenticate your API requests. Keep it secure!
-                        </p>
-
-                        {/* API Key Display */}
-                        <div className="relative">
-                            <div className="flex items-center gap-2 p-4 bg-muted rounded-lg font-mono text-sm break-all">
-                                {showApiKey ? user.apikey : maskApiKey(user.apikey)}
-                            </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="flex gap-2">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => setShowApiKey(!showApiKey)}
-                                className="gap-2 flex-1"
-                            >
-                                {showApiKey ? (
-                                    <>
-                                        <EyeOff size={16} />
-                                        Hide
-                                    </>
-                                ) : (
-                                    <>
-                                        <Eye size={16} />
-                                        View
-                                    </>
-                                )}
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={handleCopyApiKey}
-                                className="gap-2 flex-1"
-                            >
-                                {copied ? (
-                                    <>
-                                        <CheckCircle size={16} className="text-green-500" />
-                                        Copied!
-                                    </>
-                                ) : (
-                                    <>
-                                        <Copy size={16} />
-                                        Copy
-                                    </>
-                                )}
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Logout Button */}
-                <Button
-                    variant="destructive"
-                    onClick={handleLogout}
-                    className="w-full gap-2"
-                    size="lg"
-                >
-                    <LogOut size={18} />
-                    Sign Out
-                </Button>
-            </div>
-        </div>
-    );
+  return (
+    <div className="min-h-[calc(100vh-4rem)] flex justify-center px-4 py-12 items-start">
+      <AccountClientView user={serializedUser} />
+    </div>
+  )
 }

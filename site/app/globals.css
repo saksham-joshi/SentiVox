@@ -1,163 +1,119 @@
-@import "tailwindcss";
-
-
-:root {
-  /* Primary palette */
-  --primary: #4489c8;
-  --primary-hover: #5a9cd6;
-  --primary-muted: #2a5a87;
-  --primary-foreground: #ffffff;
-
-  /* Dark theme colors */
-  --background: #0a0a0f;
-  --foreground: #fafafa;
-
-  /* Surface colors */
-  --card: #121218;
-  --card-foreground: #fafafa;
-  --card-hover: #1a1a24;
-
-  /* Border and muted */
-  --border: #27272a;
-  --muted: #18181b;
-  --muted-foreground: #a1a1aa;
-
-  /* Status colors */
-  --success: #22c55e;
-  --success-soft: rgba(34, 197, 94, 0.15);
-  --danger: #ef4444;
-  --danger-soft: rgba(239, 68, 68, 0.15);
-  --warning: #f59e0b;
-  --warning-soft: rgba(245, 158, 11, 0.15);
-  --neutral: #71717a;
-  --neutral-soft: rgba(113, 113, 122, 0.15);
-
-  /* Input and focus */
-  --input: #27272a;
-  --ring: #4489c8;
-
-  /* Radius */
-  --radius: 0.75rem;
-}
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import 'tailwindcss';
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-hover: var(--primary-hover);
-  --color-primary-muted: var(--primary-muted);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-card-hover: var(--card-hover);
-  --color-border: var(--border);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-success: var(--success);
-  --color-success-soft: var(--success-soft);
-  --color-danger: var(--danger);
-  --color-danger-soft: var(--danger-soft);
-  --color-warning: var(--warning);
-  --color-warning-soft: var(--warning-soft);
-  --color-neutral: var(--neutral);
-  --color-neutral-soft: var(--neutral-soft);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Typography */
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Radius */
+  --radius: 0.75rem;
+  /* ── Dark Mode Colors (default) ──────────────────────────────────────── */
+  --color-background: #010510;
+  --color-surface: #081526;
+  --color-surface-alt: #030f1f;
+  --color-surface-soft: #0c112b;
+  --color-border: #1b4552;
+  --color-border-strong: #284858;
+  --color-foreground: #f5f8ff;
+  --color-foreground-secondary: #a7b2c4;
+  --color-foreground-muted: #78869a;
+  --color-foreground-disabled: #4e5c70;
+  --color-primary: #02bbad;
+  --color-primary-hover: #00d0c0;
+  --color-primary-soft: #042a39;
+  --color-primary-glow: #18b878;
+  --color-cyan: #02bbad;
+  --color-teal: #18b878;
+  --color-purple: #a879d6;
+  --color-pink: #d65c9a;
+  --color-red: #e45d78;
+  --color-success: #02bbad;
+  --color-warning: #d69a55;
+  --color-danger: #e45d78;
+  --color-info: #4c9fd1;
+  /* CSS-var aliases used by Tailwind v4 utilities */
+  --color-card: #081526;
+  --color-card-hover: #0c1f30;
+  --color-muted: #0c112b;
+  --color-muted-foreground: #78869a;
+  --color-input: #1b4552;
+  --color-ring: #02bbad;
+  --color-destructive: #e45d78;
 }
 
-* {
-  border-color: var(--border);
+/* ─── Base non-theme vars (dark defaults) ────────────────────────────────────── */
+/* These aren't Tailwind tokens — they're used by glass, glow, and scrollbar.    */
+:root {
+  --glass-bg: rgba(8, 21, 38, 0.65);
+  --glass-border: rgba(27, 69, 82, 0.6);
+  --glow-soft: rgba(2, 187, 173, 0.3);
+  --glow-strong: rgba(2, 187, 173, 0.6);
+  --scrollbar-thumb: rgba(2, 187, 173, 0.3);
+  --scrollbar-thumb-hover: rgba(2, 187, 173, 0.6);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0ms !important;
-    animation-iteration-count: 0 !important;
-    transition-duration: 0ms !important;
-  }
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .animate-pulse {
-    will-change: opacity;
-  }
+/* ─── Glassmorphism Utility ──────────────────────────────────────────────────── */
+/* glass: adapts to system theme automatically via --glass-bg / --glass-border  */
+@utility glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
 }
 
-@supports (view-transition-name: none) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 0s;
-  }
-
-  ::view-transition-old(root) {
-    animation-name: fade-out;
-  }
-
-  ::view-transition-new(root) {
-    animation-name: fade-in;
-  }
+/* glass-light: always the light variant, regardless of system theme */
+@utility glass-light {
+  background: rgba(245, 248, 248, 0.65);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(199, 209, 234, 0.6);
 }
 
-@keyframes fade-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-::selection {
-  background: rgba(68, 137, 200, 0.3);
-  color: var(--foreground);
-}
-
-.focus-ring {
-  @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
-}
-
-.gradient-text {
+/* ─── Gradient Text ─────────────────────────────────────────────────────────── */
+/* Uses CSS vars so the gradient shifts with the active palette automatically.  */
+@utility gradient-text {
   background: linear-gradient(
     135deg,
-    var(--primary) 0%,
-    var(--primary-hover) 100%
+    var(--color-primary) 0%,
+    var(--color-primary-glow) 50%,
+    var(--color-purple) 100%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Glass effect */
-.glass {
-  background: rgba(18, 18, 24, 0.8);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
+/* ─── Animations ────────────────────────────────────────────────────────────── */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Smooth transitions */
-.transition-default {
-  @apply transition-all duration-200 ease-out;
-}
-
-/* Animations */
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -167,40 +123,91 @@ html {
   }
 }
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* pulse-glow uses CSS vars so it matches the active theme's primary color */
 @keyframes pulse-glow {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(68, 137, 200, 0.2);
+    box-shadow: 0 0 8px 0px var(--glow-soft);
   }
   50% {
-    box-shadow: 0 0 40px rgba(68, 137, 200, 0.4);
+    box-shadow: 0 0 20px 4px var(--glow-strong);
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+@keyframes typing-dot {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.animate-slide-up {
-  animation: slide-up 0.4s ease-out;
+/* Voice-input waveform bars */
+@keyframes voice-bar {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
 }
 
-.animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+@utility animate-voice-bar {
+  animation: voice-bar 0.9s ease-in-out infinite;
 }
 
-* {
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) var(--background);
+@utility animate-slide-up {
+  animation: slide-up 0.3s ease-out both;
+}
+
+@utility animate-fade-in {
+  animation: fade-in 0.2s ease-out both;
+}
+
+@utility animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Scrollbar */
+::-webkit-scrollbar {
+  width: 0px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 0px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: transparent;
+}
+
+/* ─── Safe area padding (mobile) ─────────────────────────────────────────────── */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ─── Focus ring ────────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

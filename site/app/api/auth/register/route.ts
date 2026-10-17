@@ -1,102 +1,64 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createUser, isApiKeyUnique } from "@/network/supabase";
-import { generateApiKey } from "@/network/api";
-import { grantFreeTokens } from "@/network/redis";
-import { VALUES } from "@/lib/values";
-
-// Name validation: alphabets and spaces only, max 19 characters
-function isValidName(name: string): boolean {
-  const nameRegex = /^[A-Za-z\s]+$/;
-  return nameRegex.test(name) && name.length >= 2 && name.length <= 19;
-}
-
-function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) return false;
-
-  return VALUES.ALLOWED_EMAIL_DOMAINS.some((domain) =>
-    email.toLowerCase().endsWith(domain)
-  );
-}
-
-// Generate a unique API key (retry if collision)
-async function generateUniqueApiKey(): Promise<string> {
-  const maxAttempts = 5;
-
-  for (let i = 0; i < maxAttempts; i++) {
-    const apiKey = generateApiKey();
-
-    if (await isApiKeyUnique(apiKey)) {
-      return apiKey;
-    }
-  }
-
-  throw new Error("Failed to generate unique API key after multiple attempts");
-}
+import { NextRequest, NextResponse } from 'next/server'
+import { VALUES } from '@/lib/values'
+import { registerNewUser } from '@/db/pg'
+import { isValidEmail, isValidName } from '@/lib/validator'
+import { createSession } from '@/lib/session'
+import { grantFreeTokens } from '@/api/redis-interface/redis'
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { email, name } = body;
+    const body = await request.json()
+    const { email, name } = body
 
     // Validate email
-    if (!email || typeof email !== "string") {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
+    if (!email || typeof email !== 'string') {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedEmail = email.toLowerCase().trim()
 
     if (!isValidEmail(normalizedEmail)) {
       return NextResponse.json(
         {
           error: `Only ${VALUES.ALLOWED_EMAIL_DOMAINS.join(
-            " or "
+            ' or '
           )} emails are allowed`,
         },
         { status: 400 }
-      );
+      )
     }
 
     // Validate name
-    if (!name || typeof name !== "string") {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
+    if (!name || typeof name !== 'string') {
+      return NextResponse.json({ error: 'Name is required' }, { status: 400 })
     }
 
-    const trimmedName = name.trim();
+    const trimmedName = name.trim()
 
     if (!isValidName(trimmedName)) {
-      return NextResponse.json(
-        {
-          error: "Name must contain only alphabets and spaces, 2-19 characters",
-        },
-        { status: 400 }
-      );
+      return NextResponse.json({
+        error: 'Name must contain only alphabets and spaces, 2-19 characters',
+        status: 400,
+      })
     }
 
-    // Generate unique API key
-    const apiKey = await generateUniqueApiKey();
+    // register the new user
+    const user = await registerNewUser(normalizedEmail, trimmedName)
 
-    // Add free tokens
-    if (!await grantFreeTokens(apiKey))
-    {
-      return NextResponse.json(
-        { error: "Failed to add free tokens. Please try again." },
-        { status: 500 }
-      );
+    if (user.success) {
+      await grantFreeTokens(user.apiKey)
+      await createSession({
+        userId: user.email,
+        email: user.email,
+        name: user.fullName,
+      })
     }
-
-    // Create user in Supabase
-    const user = await createUser(normalizedEmail, trimmedName, apiKey);
-
-    return NextResponse.json({
-      success: true,
-      user: user,
-    });
+    return NextResponse.json(user)
   } catch (error) {
-    console.error("Register error:", error);
-    return NextResponse.json(
-      { error: "Failed to create account. Please try again." },
-      { status: 500 }
-    );
+    console.error('Register error:', error)
   }
+  return NextResponse.json(
+    { error: 'Failed to create account. Please try again.' },
+    { status: 500 }
+  )
 }
