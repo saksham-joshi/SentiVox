@@ -1,58 +1,58 @@
-import { ReactNode } from "react";
-import { SVG } from "./svg";
+import { ReactNode } from 'react'
+import { SVG } from './svg'
 
 interface TechIcon {
-    name: string;
-    svg: ReactNode;
+  name: string
+  svg: ReactNode
 }
 
 export const TechIcons: TechIcon[] = [
-    {
-        name: "TypeScript",
-        svg: SVG.typescript
-    },
-    {
-        name: "Next.js",
-        svg: SVG.nextjs
-    },
-    {
-        name: "ElysiaJS",
-        svg: SVG.elysiajs
-    },
-    {
-        name: "Bun",
-        svg: SVG.bun
-    },
-    {
-        name: "Render",
-        svg: SVG.render
-    },
-    {
-        name: "Redis",
-        svg: SVG.redis
-    },
-    {
-        name: "Supabase",
-        svg: SVG.supabase
-    },
-    {
-        name: "Python",
-        svg: SVG.python
-    },
-    {
-        name: "Vercel",
-        svg: SVG.vercel
-    },
-    {
-        name: "NodeMailer",
-        svg: SVG.nodemailer
-    },
-    {
-        name: "CronJob.org",
-        svg: SVG.cronjob
-    },
-    {
-        name: "GitHub",
-        svg: SVG.github
-    }
-];
+  {
+    name: 'Next.js',
+    svg: SVG.nextjs(24),
+  },
+  {
+    name: 'ElysiaJS',
+    svg: SVG.elysiajs(24),
+  },
+  {
+    name: 'Bun',
+    svg: SVG.bun(24),
+  },
+  {
+    name: 'Express.js',
+    svg: SVG.express(24),
+  },
+  {
+    name: 'Render',
+    svg: SVG.render(24),
+  },
+  {
+    name: 'Redis',
+    svg: SVG.redis(24),
+  },
+  {
+    name: 'Supabase',
+    svg: SVG.supabase(24),
+  },
+  {
+    name: 'PostgreSql',
+    svg: SVG.postgresql(24),
+  },
+  {
+    name: 'Drizzle ORM',
+    svg: SVG.drizzle(24),
+  },
+  {
+    name: 'Python',
+    svg: SVG.python(24),
+  },
+  {
+    name: 'Upstash',
+    svg: SVG.upstash(24),
+  },
+  {
+    name: 'NodeMailer',
+    svg: SVG.nodemailer(24),
+  },
+]
