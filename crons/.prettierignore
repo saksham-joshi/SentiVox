@@ -1,0 +1,16 @@
+/node_modules
+.pnp
+.pnp.js
+/coverage
+/out/
+/build
+.vercel
+package.json
+package-lock.json
+.gitignore
+yarn.lock
+.eslintrc.json
+.prettierc
+.prettierignore
+README.md
+.env
