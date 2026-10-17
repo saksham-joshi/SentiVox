@@ -1,0 +1,9 @@
+CREATE OR REPLACE FUNCTION is_apikey_unique (
+    __api_key VARCHAR
+) RETURNS BOOLEAN AS $$
+BEGIN
+    PERFORM 1 FROM users WHERE api_key = __api_key;
+
+    RETURN NOT FOUND; -- TRUE IF NOT FOUND, FALSE IF FOUND
+END;
+$$ LANGUAGE plpgsql;
