@@ -40,6 +40,14 @@ A complete package for performing multilingual sentiment analysis with exception
 
 ---
 
+## System Architecture
+
+<div align="center">
+   <img src="Images/Senti-Vox-architecture.png" width="75%"/>
+</div>
+
+---
+
 ## 🛠️ Tech Stack
 
 <table>
